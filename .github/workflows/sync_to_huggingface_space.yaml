@@ -2,19 +2,31 @@ name: Sync to Hugging Face hub
 on:
   push:
     branches: [main]
-
-  # to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
   sync-to-hub:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
           lfs: true
-      - name: Push to hub
+
+      - name: Install Git LFS
+        run: |
+          curl -s https://packagecloud.io/install/repositories/github/git-lfs/script.deb.sh | sudo bash
+          sudo apt-get install git-lfs
+          git lfs install
+
+      - name: Pull LFS objects
+        run: git lfs pull
+
+      - name: Enable large file support for Hugging Face
+        run: huggingface-cli lfs-enable-largefiles .
+
+      - name: Push to Hugging Face hub
         env:
           HF_TOKEN: ${{ secrets.HF_TOKEN }}
         run: git push https://ayathf:$HF_TOKEN@huggingface.co/spaces/ayathf/cd_model_2 main
