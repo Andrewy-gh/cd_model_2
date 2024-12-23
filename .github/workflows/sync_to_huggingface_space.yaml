@@ -23,6 +23,9 @@ jobs:
       - name: Pull LFS objects
         run: git lfs pull
 
+      - name: Install Hugging Face CLI
+        run: pip install huggingface_hub[cli]
+
       - name: Enable large file support for Hugging Face
         run: huggingface-cli lfs-enable-largefiles .
 
